@@ -3,3 +3,7 @@ toolbarMode = "minimal"
 
 [ui]
 hideTopBar = true
+
+[theme]
+# Optional: set default theme
+base = "light"
