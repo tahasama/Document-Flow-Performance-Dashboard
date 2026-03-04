@@ -865,21 +865,21 @@ def main():
             </div>
             """, unsafe_allow_html=True)
         
-        # Data download section
-        st.markdown('<h2 class="section-header">📥 Download Processed Data</h2>', unsafe_allow_html=True)
-        col1, col2, col3, col4 = st.columns(4)
+        # # Data download section
+        # st.markdown('<h2 class="section-header">📥 Download Processed Data</h2>', unsafe_allow_html=True)
+        # col1, col2, col3, col4 = st.columns(4)
         
-        with col1:
-            st.markdown(create_download_link(results['df'], "merged_data.csv"), unsafe_allow_html=True)
+        # with col1:
+        #     st.markdown(create_download_link(results['df'], "merged_data.csv"), unsafe_allow_html=True)
         
-        with col2:
-            st.markdown(create_download_link(results['risk'], "discipline_risk.csv"), unsafe_allow_html=True)
+        # with col2:
+        #     st.markdown(create_download_link(results['risk'], "discipline_risk.csv"), unsafe_allow_html=True)
         
-        with col3:
-            if not results['review_perf'].empty:
-                st.markdown(create_download_link(results['review_perf'], "reviewer_performance.csv"), unsafe_allow_html=True)
+        # with col3:
+        #     if not results['review_perf'].empty:
+        #         st.markdown(create_download_link(results['review_perf'], "reviewer_performance.csv"), unsafe_allow_html=True)
         
-        with col4:
+        # with col4:
             st.markdown(create_download_link(results['supplier_perf'], "supplier_performance.csv"), unsafe_allow_html=True)
     
     else:
