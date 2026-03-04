@@ -41,7 +41,7 @@ st.markdown("""
     }
     .section-header {
         color: #1f77b4;
-        margin-top: 2rem;
+        margin-top: 2.5rem;
         margin-bottom: 1rem;
         padding-bottom: 0.5rem;
         border-bottom: 2px solid #1f77b4;
@@ -52,6 +52,7 @@ st.markdown("""
         border-radius: 0.5rem;
         border-left: 4px solid #1f77b4;
         margin-bottom: 1rem;
+        margin-top: 1.5rem;
     }
     .action-box {
         background-color: #fff3cd;
@@ -487,19 +488,7 @@ def main():
         results = process_data(supplier_docs, workflow)
         
         # KPI Explanations
-        st.markdown("""
-        <div class="explanation-box">
-            <h4>📊 Understanding the KPIs:</h4>
-            <ul>
-                <li><strong>SLA (Service Level Agreement):</strong> A target time frame for completing reviews. Documents are considered "on-time" if approved by the due date.</li>
-                <li><strong>Supplier On-Time:</strong> Percentage of documents submitted by suppliers before or on the planned submission date.</li>
-                <li><strong>Review On-Time (SLA):</strong> Percentage of documents reviewed and approved within the SLA due date.</li>
-                <li><strong>Median Cycle Time:</strong> The middle value of total days from planned submission to final approval (less sensitive to outliers than average).</li>
-                <li><strong>Backlog Pressure:</strong> Percentage of documents that are overdue (past due date and not yet approved). Higher values indicate growing workflow bottlenecks.</li>
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-        
+      
         # Display KPIs
         st.markdown("### Key Performance Indicators")
         col1, col2, col3, col4 = st.columns(4)
@@ -536,6 +525,20 @@ def main():
                 <p>Backlog Pressure</p>
             </div>
             """, unsafe_allow_html=True)
+
+        st.markdown("""
+            <div class="explanation-box" >
+                <h4>📊 Understanding the KPIs:</h4>
+                <ul>
+                    <li><strong>SLA (Service Level Agreement):</strong> A target time frame for completing reviews. Documents are considered "on-time" if approved by the due date.</li>
+                    <li><strong>Supplier On-Time:</strong> Percentage of documents submitted by suppliers before or on the planned submission date.</li>
+                    <li><strong>Review On-Time (SLA):</strong> Percentage of documents reviewed and approved within the SLA due date.</li>
+                    <li><strong>Median Cycle Time:</strong> The middle value of total days from planned submission to final approval (less sensitive to outliers than average).</li>
+                    <li><strong>Backlog Pressure:</strong> Percentage of documents that are overdue (past due date and not yet approved). Higher values indicate growing workflow bottlenecks.</li>
+                </ul>
+            </div>
+            """, unsafe_allow_html=True)
+        
         
         # Time Contribution Analysis
         st.markdown('<h2 class="section-header">⏱️ Time Contribution Analysis</h2>', unsafe_allow_html=True)
@@ -562,9 +565,8 @@ def main():
             st.markdown(f"""
             <div class="chart-container">
                 <h4>Key Insight</h4>
-                <p><strong>Main bottleneck:</strong> {bottleneck} phase ({max(results['review_pct'], results['supplier_pct']):.1f}% of time)</p>
-                <p><strong>Balance ratio:</strong> {results['supplier_pct']/results['review_pct']:.2f}:1 (Supplier:Review)</p>
-            </div>
+                <p><strong>Primary bottleneck:</strong> {bottleneck} phase accounts for {max(results['review_pct'], results['supplier_pct']):.1f}% of total cycle time</p>
+<p><strong>Time distribution:</strong> For every day in review, {results['supplier_pct']/results['review_pct']:.2f} days are spent waiting for supplier submission</p>       </div>
             """, unsafe_allow_html=True)
         
         # Supplier Submission Performance - UPDATED with Jupyter styling
@@ -649,52 +651,52 @@ def main():
         # Discipline Risk Analysis - UPDATED with Jupyter styling
         st.markdown('<h2 class="section-header">⚠️ Discipline Risk Analysis</h2>', unsafe_allow_html=True)
         
-        col1, col2 = st.columns([2, 1])
+        # col1, col2 = st.columns([2, 1])
         
-        with col1:
-            fig, ax = plt.subplots(figsize=(12, 7))
-            top_risk = results['risk'].head(10)
-            y_pos = np.arange(len(top_risk.index))
+        # with col1:
+        #     fig, ax = plt.subplots(figsize=(12, 7))
+        #     top_risk = results['risk'].head(10)
+        #     y_pos = np.arange(len(top_risk.index))
             
-            # Use GnBu colormap like in Jupyter
-            norm = plt.Normalize(0, top_risk['Breach_%'].max())
-            cmap = plt.cm.GnBu
-            colors = cmap(norm(top_risk['Breach_%']))
+        #     # Use GnBu colormap like in Jupyter
+        #     norm = plt.Normalize(0, top_risk['Breach_%'].max())
+        #     cmap = plt.cm.GnBu
+        #     colors = cmap(norm(top_risk['Breach_%']))
             
-            ax.barh(y_pos, top_risk['Breach_%'], color=colors)
-            ax.set_yticks(y_pos)
-            ax.set_yticklabels(top_risk.index)
-            ax.set_xlabel("Breach %")
-            ax.set_title("Top 10 Disciplines by SLA Breach %", fontsize=14, fontweight='bold')
-            ax.grid(True, axis='x', linestyle='--', alpha=0.7)
+        #     ax.barh(y_pos, top_risk['Breach_%'], color=colors)
+        #     ax.set_yticks(y_pos)
+        #     ax.set_yticklabels(top_risk.index)
+        #     ax.set_xlabel("Breach %")
+        #     ax.set_title("Top 10 Disciplines by SLA Breach %", fontsize=14, fontweight='bold')
+        #     ax.grid(True, axis='x', linestyle='--', alpha=0.7)
             
-            for i, v in enumerate(top_risk['Breach_%']):
-                ax.text(v + 0.5, i, f"{v:.1f}%", va='center', fontweight='bold')
+        #     for i, v in enumerate(top_risk['Breach_%']):
+        #         ax.text(v + 0.5, i, f"{v:.1f}%", va='center', fontweight='bold')
             
-            st.pyplot(fig)
-            plt.close(fig)
+        #     st.pyplot(fig)
+        #     plt.close(fig)
         
-        with col2:
-            high_risk_count = len(results['risk'][results['risk']['Breach_%'] > 50])
-            med_risk_count = len(results['risk'][results['risk']['Breach_%'] > 30]) - high_risk_count
+        # with col2:
+        #     high_risk_count = len(results['risk'][results['risk']['Breach_%'] > 50])
+        #     med_risk_count = len(results['risk'][results['risk']['Breach_%'] > 30]) - high_risk_count
             
-            st.markdown(f"""
-            <div class="chart-container">
-                <h4>Risk Summary</h4>
-                <p><strong>🔴 Critical (>50%):</strong> {high_risk_count}</p>
-                <p><strong>🟠 High (30-50%):</strong> {med_risk_count}</p>
-                <p><strong>🟢 Low (<30%):</strong> {len(results['risk']) - high_risk_count - med_risk_count}</p>
-                <hr>
-                <h4>Top 3 Risk Areas:</h4>
-                <ol>
-                    {''.join([f"<li><strong>{results['risk'].index[idx]}</strong> ({results['risk'].iloc[idx]['Breach_%']:.1f}%)</li>" for idx in range(min(3, len(results['risk'])))])}
-                </ol>
-            </div>
-            """, unsafe_allow_html=True)
+        #     # st.markdown(f"""
+        #     # <div class="chart-container">
+        #     #     <h4>Risk Summary</h4>
+        #     #     <p><strong>🔴 Critical (>50%):</strong> {high_risk_count}</p>
+        #     #     <p><strong>🟠 High (30-50%):</strong> {med_risk_count}</p>
+        #     #     <p><strong>🟢 Low (<30%):</strong> {len(results['risk']) - high_risk_count - med_risk_count}</p>
+        #     #     <hr>
+        #     #     <h4>Top 3 Risk Areas:</h4>
+        #     #     <ol>
+        #     #         {''.join([f"<li><strong>{results['risk'].index[idx]}</strong> ({results['risk'].iloc[idx]['Breach_%']:.1f}%)</li>" for idx in range(min(3, len(results['risk'])))])}
+        #     #     </ol>
+        #     # </div>
+        #     # """, unsafe_allow_html=True)
         
         # Top 3 Risk Disciplines Styled Table
-        st.markdown("#### 🏆 Top 3 Risk Disciplines")
-        top3 = results['risk'].head(3).copy()
+        # st.markdown("#### 🏆 Top 3 Risk Disciplines")
+        top3 = results['risk'].copy()
         styled_top3 = top3.style.format({
             "Breach_%": "{:.1f}%",
             "Total": "{:.0f}",
@@ -706,19 +708,7 @@ def main():
         
         st.dataframe(styled_top3, use_container_width=True)
         
-        # Detailed Discipline Risk Data - UPDATED with Jupyter styling
-        st.markdown("#### 📋 Detailed Discipline Risk Data")
-        styled_risk = results['risk'].style.format({
-            "Breach_%": "{:.1f}%",
-            "Total": "{:.0f}",
-            "Late": "{:.0f}"
-        }).background_gradient(subset=["Breach_%"], cmap="Reds"
-        ).background_gradient(subset=["Late"], cmap="Oranges"
-        ).background_gradient(subset=["Total"], cmap="Blues"
-        ).set_properties(**{"text-align": "center", "min-width": "120px"})
-        
-        st.dataframe(styled_risk, use_container_width=True)
-        
+
         # Reviewer Performance
         st.markdown('<h2 class="section-header">👥 Reviewer Performance</h2>', unsafe_allow_html=True)
         
@@ -885,6 +875,20 @@ def main():
     else:
         st.info("Please upload both Excel files to begin the analysis.")
         st.image("https://cdn-icons-png.flaticon.com/512/3135/3135711.png", width=200)
+
+        st.markdown("""
+            <style>
+                /* Hide all header buttons except the last one (three-dot menu) */
+                .stApp header button[kind="header"]:not(:last-child) {
+                    display: none !important;
+                }
+                
+                /* Hide any header images (like GitHub icon) */
+                .stApp header img {
+                    display: none !important;
+                }
+            </style>
+            """, unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
